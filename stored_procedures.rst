@@ -31,3 +31,9 @@ plpgsql is a full-fledged procedural language, with variables, looping construct
 
 
 PL/pgSQL is the only programming language installed by default for PostgreSQL, but many others are available, including PL/Java,[4] PL/Perl,[5] PL/pgPSM,[6] PL/php,[7] PL/Python,[8] PL/R,[9] PL/Ruby,[10] PL/sh, PL/Tcl, and PL/Lua. PostgreSQL uses Bison as its parser,[11] making it easy to port many open-source languages, as well as to reuse code.
+
+ function declaration decorators
+ --------------------------------
+
+As of PostgreSQL 9.4, there are four that will actually impact performance: VOLATILE, STABLE, STRICT, and IMMUTABLE.
+
