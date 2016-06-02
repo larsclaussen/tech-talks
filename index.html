@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Permanent+Marker);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .header {
+        background: #dddddd;
+        font-family: 'Permanent Marker', cursive;
+        text-align: center;
+        border-top: solid #67b6f4 4px;
+        /*border-left: solid #67b6f4 6px;*/
+      }
+      .pro {border-top: solid 6px darkgreen}
+      .con {border-top: solid 6px darkred}
+
+      .rcorners {
+          border-radius: 25px;
+      }
+
+      .split-left { float: left; width: 48%; }
+      .split-right { float: right; width: 48%; }
+
+      .detail {margin-left: 30px; background: #dddddd; border-left: solid #67b6f4 4px; width: 70%; padding-left: 5%; padding-right: 10px; font-style: italic; font-size: 15px}
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+## Postgres Stored procedures
+
+---
+
+.header[
+postgres - stored procedures]
+
+--
+
+layout: true
+
+---
+
+# Agenda
+
+1. What is a "stored procedure"?
+2. Why would you use it? Why not?
+3. Declaration decorators
+4. Use case NENS: stored procedure as check constraints
+5. ...
+
+---
+
+
+```sql
+CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
+BEGIN
+    -- Check that the geomtry we want to snap is valid
+    IF ST_IsValid(NEW.the_geom) = 'f' THEN
+        RAISE EXCEPTION 'invalid geometry, cannot be snaped to grid';
+    END IF;
+
+    -- update the geometry
+    NEW.the_geom := ST_SnapToGrid(NEW.the_geom, 0, 0, 0.001, 0.001);
+
+    -- NEW.the_geom := ST_Transform(NEW.the_geom, 4326);
+    NEW.txt := ST_AsText(NEW.the_geom);
+    RETURN NEW;
+END;
+$geom_to_grid$ LANGUAGE plpgsql;
+
+CREATE TRIGGER geom_to_grid BEFORE INSERT OR UPDATE ON  test_pnt
+    FOR EACH ROW EXECUTE PROCEDURE geom_to_grid();
+
+end
+```
+
+
+---
+
+# What is a "stored procedure"?
+
+- a user definied function
+
+- postgres supports various " procedural languages" (hence the name)
+
+- out of the box: sql & PL/pgSQL
+
+- other include PL/Java, PL/Perl, PL/php, PL/Python, PL/R, PL/Ruby, PL/sh, PL/Tcl,...
+
+---
+
+# Why would you use it? Why not?
+
+--
+
+count: false
+
+.split-left[
+.pro[pro]
+- less communication between app and database server
+- SQL statements are wrapped inside a function --> only one function
+  call instead of multiple SQL statements
+- stored procedures are pre-compiled (more on this topic soon)
+]
+
+--
+
+count: false
+
+.split-right[
+.con[con]
+- version control is difficult
+- hard to debug
+- difficult to implementing unittests
+]
+
+---
+
+# Declaration decorators
+
+Important because they affect performance!
+
+- VOLATILE
+
+.detail[default]
+
+- STABLE
+
+.detail[implication: function can not modify the contents of the
+      database in any way]
+
+
+- IMMUTABLE
+
+.detail[This tells the planner that the function will always return the same result for the same parameters. Due to that guarantee, function calls can tacitly be replaced by
+      the the cached results where that benefits the planner]
+
+- STRICT
+
+.detail[assumes that a function with any NULL parameters will also return NULL. Again, this is an optimization where the planner can completely substitute a function call with NULL, thereby not only removing the function execution itself,
+but avoiding the requisite function parameter and return value mapping.]
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        highlightLanguage: 'sql',
+        highlightStyle: 'tomorrow-night-eighties'
+        });
+    </script>
+  </body>
+</html>

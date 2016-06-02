@@ -26,7 +26,9 @@ PostgreSQL allows more than one function to have the same name, so long as the a
 
 
 
-plpgsql is a full-fledged procedural language, with variables, looping constructs, etc. A SQL function is simply a subquery. A SQL function, if it is declared STABLE or IMMUTABLE and not also declared STRICT, can often be inlined into the calling query, as if it were written out on each reference.
+plpgsql is a full-fledged procedural language, with variables, looping constructs, etc.
+A SQL function is simply a subquery. A SQL function, if it is declared STABLE or IMMUTABLE
+and not also declared STRICT, can often be inlined into the calling query, as if it were written out on each reference.
 
 
 
@@ -44,9 +46,12 @@ As of PostgreSQL 9.4, there are four that will actually impact performance: VOLA
 
 STABLE attribute is a bit more stringent. The implication in this case, is that the function can not modify the contents of the database in any way
 
-IMMUTABLE keyword, which takes the optimization one step further. This tells the planner that the function will always return the same result for the same parameters. Due to that guarantee, function calls can tacitly be replaced by the the cached results where that benefits the planner
+IMMUTABLE keyword, which takes the optimization one step further. This tells the planner that the function will always return the same result for the same parameters.
+Due to that guarantee, function calls can tacitly be replaced by the the cached results where that benefits the planner
 
-Finally comes the STRICT decorator. It goes one step further than IMMUTABLE and assumes that a function with any NULL parameters will also return NULL. Again, this is an optimization where the planner can completely substitute a function call with NULL, thereby not only removing the function execution itself, but avoiding the requisite function parameter and return value mapping. 
+Finally comes the STRICT decorator. It goes one step further than IMMUTABLE and assumes that a function with any NULL parameters will also return NULL.
+Again, this is an optimization where the planner can completely substitute a function call with NULL, thereby not only removing the function execution itself,
+but avoiding the requisite function parameter and return value mapping.
 
 from: http://www.divillo.com/
 
