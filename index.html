@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>postgres - stored procedures</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -70,7 +70,7 @@ CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
 BEGIN
     -- Check that the geomtry we want to snap is valid
     IF ST_IsValid(NEW.the_geom) = 'f' THEN
-        RAISE EXCEPTION 'invalid geometry, cannot be snaped to grid';
+        RAISE EXCEPTION 'invalid geometry, cannot be snapped to grid';
     END IF;
 
     -- update the geometry
@@ -125,7 +125,7 @@ count: false
 .con[con]
 - version control is difficult
 - hard to debug
-- difficult to implementing unittests
+- hard to implement unittests
 ]
 
 ---
@@ -139,20 +139,47 @@ Important because they affect performance!
 .detail[default]
 
 - STABLE
-
 .detail[implication: function can not modify the contents of the
       database in any way]
 
-
 - IMMUTABLE
-
 .detail[This tells the planner that the function will always return the same result for the same parameters. Due to that guarantee, function calls can tacitly be replaced by
       the the cached results where that benefits the planner]
 
 - STRICT
-
 .detail[assumes that a function with any NULL parameters will also return NULL. Again, this is an optimization where the planner can completely substitute a function call with NULL, thereby not only removing the function execution itself,
 but avoiding the requisite function parameter and return value mapping.]
+
+
+---
+```sql
+-- create test table with 1 mio rows
+CREATE TABLE test_series AS
+SELECT *
+FROM generate_series(1, 1000000) AS id;
+
+-- index on id
+CREATE INDEX idx_series ON test_series (id);
+
+select round(17.5, 0)::int;
+
+-- example IMMUTABLE
+explain SELECT * FROM test_series WHERE id = round(17.5, 0)::int;
+
+SELECT proname, provolatile FROM pg_proc WHERE proname = 'round' LIMIT 1;
+
+-- Technically this means that PostgreSQL can calculate the function ONCE and use it to search the index.
+-- Inside PostgreSQL the function is marked a IMMUTABLE. Its output will never change
+
+explain SELECT * FROM test_series WHERE id = random()::int4;
+
+explain analyze SELECT * FROM test_series WHERE id = random()::int4;
+
+explain analyze SELECT * FROM test_series WHERE id = round(17.5, 0)::int4;
+
+
+
+```
 
     </textarea>
     <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">

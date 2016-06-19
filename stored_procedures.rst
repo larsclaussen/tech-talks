@@ -68,7 +68,7 @@ for functions in all other languages. Larger values cause the planner
 to try to avoid evaluating the function more often than necessary. "
 
 
-on cost and declaration http://www.cybertec.at/2013/05/functions-the-most-widely-ignored-performance-tweak/
+    on cost and declaration http://www.cybertec.at/2013/05/functions-the-most-widely-ignored-performance-tweak/
 
 
 
