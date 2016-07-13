@@ -24,6 +24,7 @@
       }
       .pro {border-top: solid 6px darkgreen}
       .con {border-top: solid 6px darkred}
+      .bold {font-style: bold; font-size: 28px}
 
       .rcorners {
           border-radius: 25px;
@@ -31,6 +32,9 @@
 
       .split-left { float: left; width: 48%; }
       .split-right { float: right; width: 48%; }
+
+      .agenda {font-size: 32px}
+
 
       .detail {margin-left: 30px;
         background: #dddddd;
@@ -48,7 +52,11 @@
 
 class: center, middle
 
-## Postgres Stored procedures
+## Stored procedures...
+
+.bold[“...are like crack.”]
+
+
 
 ---
 
@@ -63,11 +71,15 @@ layout: true
 
 # Agenda
 
-1. What is a "stored procedure"?
+.agenda[1. What is a "stored procedure"?
+
 2. How are they used?
+
 3. Declaration decorators
+
 4. Use case 3Di: stored procedure as check constraints and triggers
-5. Why would you use it? Why not?
+
+5. Why would you use it? Why not?]
 
 
 ---
@@ -83,16 +95,36 @@ RETURNS some_type | setof sometype | TABLE (..) AS
 $$
 BODY of function
 $$
-LANGUAGE language_of_fucntion
+LANGUAGE language_of_function
 ```
 - postgres supports various " procedural languages"
 
 - out of the box: sql & PL/pgSQL
 
+   - variables
+   - if/then/else loops
+   - cursors
+   - error checking
+
 - other include PL/Java, PL/Perl, PL/php, PL/Python, PL/R, PL/Ruby, PL/sh, PL/Tcl,...
 
 ---
 
+# What is a "stored procedure"?
+
+- target-list
+```sql
+    SELECT myfunc(f1) FROM foo;
+```
+- FROM clause:
+```sql
+    SELECT * FROM myfunc();
+```
+- WHERE clause:
+```sql
+    SELECT * FROM foo WHERE myfunc(f1) = 42;
+```
+---
 # How are they used?
 
 - operators
@@ -134,6 +166,24 @@ DROP OPERATOR + (text, text);
 
 ---
 
+example aggregate
+
+```sql
+CREATE OR REPLACE FUNCTION my_concat(text, ANYELEMENT)
+RETURNS text AS
+$$
+  SELECT concat_ws('---', $1, $2)
+$$ LANGUAGE sql;
+
+CREATE AGGREGATE str_agg (ANYELEMENT) (
+  sfunc = my_concat,
+  stype = text);
+SELECT str_agg(f1) FROM foo;
+```
+
+---
+
+
 # Declaration decorators
 
 Important because they affect performance!
@@ -150,7 +200,7 @@ Important because they affect performance!
 - STABLE
 .detail[Returns same result for same arguments within single query.
         Within the context of a transaction, this means the function can
-        be semi-optimized by preventing extra calls because the data should not change]
+        be semi-optimized by preventing extra calls because the data should not change, Example ``now()``]
 
 
 ---
@@ -171,7 +221,7 @@ Important because they affect performance!
 ```sql
 CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
 BEGIN
-    -- Check that the geomtry we want to snap is valid
+    -- Check that the geometry we want to snap is valid
     IF ST_IsValid(NEW.the_geom) = 'f' THEN
         RAISE EXCEPTION 'invalid geometry, cannot be snapped to grid';
     END IF;
@@ -225,11 +275,10 @@ count: false
 ]
 
 ---
+# Thank you!
 
+Questions?
 
-
-
-```
 
     </textarea>
     <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
