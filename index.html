@@ -247,8 +247,11 @@ CREATE TRIGGER geom_to_grid
 ```
 
 ---
-![Default-aligned image](image.jpg)
+![Default-aligned image](on_channel.png)
 ---
+![Default-aligned image](not_on_channel.png)
+---
+
 ```sql
 CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
 BEGIN
@@ -269,15 +272,6 @@ CREATE TRIGGER geom_to_grid BEFORE INSERT OR UPDATE ON  table_name
 
 ```
 
----
-
-```sql
-ALTER TABLE public.<table_name>
-ADD CONSTRAINT lies_on_channel_vertex
-CHECK (intersects_channel(
-   the_geom,
-   channel_id)=1);
-```
 
 ---
 # Why would you use it? Why not?
