@@ -218,6 +218,38 @@ Important because they affect performance!
 ---
 
 ```sql
+
+CREATE TABLE v2_windshielding
+(
+  id serial NOT NULL,
+  channel_id integer,
+  ...
+  southwest double precision,
+  west double precision,
+  northwest double precision,
+  the_geom geometry(Point,28992),
+  CONSTRAINT v2_windshielding_pkey PRIMARY KEY (id),
+  CONSTRAINT channel_id_refs_id_79d66cdb FOREIGN KEY (channel_id)
+      REFERENCES v2_channel (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT must_be_on_channel CHECK (on_channel(channel_id, the_geom) = 1)
+)
+...
+-- Trigger: geom_to_grid on v2_windshielding
+
+-- DROP TRIGGER geom_to_grid ON v2_windshielding;
+
+CREATE TRIGGER geom_to_grid
+  BEFORE INSERT OR UPDATE
+  ON v2_windshielding
+  FOR EACH ROW
+  EXECUTE PROCEDURE geom_to_grid();
+```
+
+---
+![Default-aligned image](image.jpg)
+---
+```sql
 CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
 BEGIN
     -- Check that the geometry we want to snap is valid
