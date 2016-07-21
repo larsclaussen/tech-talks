@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>postgres - stored procedures</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Permanent+Marker);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .header {
+        background: #dddddd;
+        font-family: 'Permanent Marker', cursive;
+        text-align: center;
+        border-top: solid #67b6f4 4px;
+        /*border-left: solid #67b6f4 6px;*/
+      }
+      .pro {border-top: solid 6px darkgreen}
+      .con {border-top: solid 6px darkred}
+      .bold {font-style: bold; font-size: 28px}
+
+      .rcorners {
+          border-radius: 25px;
+      }
+      img[alt=train] { width: 100%; }
+      .split-left { float: left; width: 48%; }
+      .split-right { float: right; width: 48%; }
+
+      .fat {font-size: 32px}
+
+
+      .detail {margin-left: 30px;
+        background: #dddddd;
+        border-left: solid #67b6f4 4px;
+        width: 70%;
+        padding-left: 5%;
+        padding-right: 10px;
+        font-style: italic;
+        font-size: 17px}
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+## Live hydrological modelling
+
+
+
+---
+layout: true
+
+.header[
+3Di - Live hydrological modelling]
+
+---
+# It's a long ride
+
+
+![train](3Ditrain.png)
+
+
+---
+
+# Main components
+
+--
+
+count: false
+
+
+* Inpy: convert model (sqlite + rasters) into files that the calculation core can understand.
+
+--
+
+* Machine manager: manages starting, killing, running docker containers and vm’s
+--
+
+* Socket server: serves interactive session data and more static html, css, js.
+--
+
+* Docker container/vm with calculation core: a small isolated machine that does the 3Di simulation.
+--
+
+* Threedicore: The actual calculation core that does the computations.
+--
+
+* Flow-wms: map visualization
+
+---
+![Default-aligned image](not_on_channel.png)
+---
+
+```sql
+CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
+BEGIN
+    -- Check that the geometry we want to snap is valid
+    IF ST_IsValid(NEW.the_geom) = 'f' THEN
+        RAISE EXCEPTION 'invalid geometry, cannot be snapped to grid';
+    END IF;
+
+    -- snap the geometry to a grid (precision is 1mm)
+    NEW.the_geom := ST_SnapToGrid(NEW.the_geom, 0, 0, 0.001, 0.001);
+
+    RETURN NEW;
+END;
+$geom_to_grid$ LANGUAGE plpgsql VOLATILE;
+
+CREATE TRIGGER geom_to_grid BEFORE INSERT OR UPDATE ON  table_name
+    FOR EACH ROW EXECUTE PROCEDURE geom_to_grid();
+
+```
+
+
+---
+# Why would you use it? Why not?
+
+--
+
+count: false
+
+.split-left[
+.pro[pro]
+- less communication between app and database server
+- SQL statements are wrapped inside a function --> only one function
+  call instead of multiple SQL statements
+- performance
+]
+
+--
+
+count: false
+
+.split-right[
+.con[con]
+- version control is difficult
+- hard to debug
+- hard to implement unittests
+]
+
+---
+layout: false
+class: middle, center
+# Thank you!
+
+.fat[Questions?]
+
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        highlightLanguage: 'sql',
+        highlightStyle: 'tomorrow-night-eighties'
+        });
+    </script>
+  </body>
+</html>
