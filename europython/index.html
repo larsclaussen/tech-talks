@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>postgres - stored procedures</title>
+    <title>3Di - Live hydrological modelling</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -14,6 +14,7 @@
         font-family: 'Yanone Kaffeesatz';
         font-weight: normal;
       }
+      a {color: #4da6ff; text-decoration: none; font-size: 36px;}
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       .header {
         background: #dddddd;
@@ -51,11 +52,13 @@
     <textarea id="source">
 
 class: center, middle
+background-image: url(live_modelling_trans.png)
 
 ## Live hydrological modelling
+.ref[https://www.nelen-schuurmans.nl]
 
 
-
+L. Claussen
 ---
 layout: true
 
@@ -63,12 +66,16 @@ layout: true
 3Di - Live hydrological modelling]
 
 ---
-# It's a long ride
+count: false
+# Just a sec: what is a hydrological model anyway?
+--
+count: false
 
+#* a mathematical model of physical forces that affect water
+--
+count: false
 
-![train](3Ditrain.png)
-
-
+#* used for predictions
 ---
 
 # Main components
@@ -81,78 +88,65 @@ count: false
 * Inpy: convert model (sqlite + rasters) into files that the calculation core can understand.
 
 --
-
-* Machine manager: manages starting, killing, running docker containers and vm’s
---
-
-* Socket server: serves interactive session data and more static html, css, js.
---
-
-* Docker container/vm with calculation core: a small isolated machine that does the 3Di simulation.
---
+count: false
 
 * Threedicore: The actual calculation core that does the computations.
+
 --
+count: false
+
+* Machine manager: manages starting, killing, running docker containers
+
+--
+count: false
+
+* Socket server: serves interactive session data and more static html, css, js.
+
+--
+count: false
+
+* Docker container with calculation core: a small isolated machine that does the 3Di simulation.
+
+
+--
+count: false
 
 * Flow-wms: map visualization
 
----
-![Default-aligned image](not_on_channel.png)
----
-
-```sql
-CREATE OR REPLACE FUNCTION geom_to_grid() RETURNS trigger AS $geom_to_grid$
-BEGIN
-    -- Check that the geometry we want to snap is valid
-    IF ST_IsValid(NEW.the_geom) = 'f' THEN
-        RAISE EXCEPTION 'invalid geometry, cannot be snapped to grid';
-    END IF;
-
-    -- snap the geometry to a grid (precision is 1mm)
-    NEW.the_geom := ST_SnapToGrid(NEW.the_geom, 0, 0, 0.001, 0.001);
-
-    RETURN NEW;
-END;
-$geom_to_grid$ LANGUAGE plpgsql VOLATILE;
-
-CREATE TRIGGER geom_to_grid BEFORE INSERT OR UPDATE ON  table_name
-    FOR EACH ROW EXECUTE PROCEDURE geom_to_grid();
-
-```
-
 
 ---
-# Why would you use it? Why not?
-
+# All python!
 --
-
 count: false
 
-.split-left[
-.pro[pro]
-- less communication between app and database server
-- SQL statements are wrapped inside a function --> only one function
-  call instead of multiple SQL statements
-- performance
-]
-
+#Ehm, no...
 --
-
 count: false
 
-.split-right[
-.con[con]
-- version control is difficult
-- hard to debug
-- hard to implement unittests
-]
+#But lot's of it!
+
+---
+
+#stack [excerpt]:
+
+#* Django & GeoDjango
+
+#* zmq [e.g. messages for wms]
+
+#* redis [caching & pub/sub]
+
+#* angular
+
+#* leaflet [vector graphics]
+
+#* docker
+
+
 
 ---
 layout: false
 class: middle, center
 # Thank you!
-
-.fat[Questions?]
 
 
     </textarea>
