@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>pycon 2016 - a retrospective</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Permanent+Marker);
+
+      body { font-family: 'Droid Serif' }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      a {color: #4da6ff; text-decoration: none; font-size: 36px;}
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .header {
+        padding-bottom: 7px;
+        background: #67b6f4;
+        font-family: 'Ubuntu Mono', bold;
+        text-align: center;
+        border-top: solid #00008B 4px;
+        color: #00008B;
+        /*border-left: solid #67b6f4 6px;*/
+      }
+      .pro {border-top: solid 6px darkgreen}
+      .con {border-top: solid 6px darkred}
+      .bold {font-style: bold; font-size: 28px}
+
+      .rcorners {
+          border-radius: 25px;
+      }
+      img[alt=train] { width: 100%; }
+      .split-left { float: left; width: 48%; }
+      .split-right { float: right; width: 48%; }
+
+      .fat {font-size: 46px; color: #FFF}
+      .sub {font-size: 32px; padding-left: 50px}
+
+
+      .detail {margin-left: 30px;
+        background: #dddddd;
+        border-left: solid #67b6f4 4px;
+        width: 70%;
+        padding-left: 5%;
+        padding-right: 10px;
+        font-style: italic;
+        font-size: 17px}
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+background-image: url(cover.jpg)
+
+.fat[Een personlijk verslag]
+
+---
+layout: true
+
+.header[
+europython 2016 - a retrospective]
+
+---
+# Trends
+
+--
+count: false
+
+#* async
+--
+count: false
+
+#* go
+--
+count: false
+
+#* docker
+--
+count: false
+
+#* machine learning
+---
+background-image: url(trending_pycon.png)
+---
+
+# Mijn eerste talk: "Efficient Django"
+
+--
+
+count: false
+
+#* DB: toch best bekende paradigma --> less request + faster requests / less writes
+      select_related()
+      prefetch_related() / bulk_create()
+      update() etc.
+--
+
+count: false
+
+#* alles cachen: templates, queries, sessions.
+
+---
+background-image: url(cachalot.JPG)
+---
+
+# Eerste hoogtepunt: Managing technical debt
+
+--
+count: false
+
+#* mooi: niet allen op code level
+
+--
+count: false
+
+#* architecture level
+
+.sub[* application level
+* infrastructure level]
+
+--
+count: false
+
+#* specification level
+
+
+
+---
+background-image: url(beach.JPG)
+---
+
+# "Effective code review"
+
+![Default-aligned image](code_review.JPG)
+
+---
+# "Effective code review"
+--
+count: false
+
+#* code defects (60%)
+
+--
+count: false
+
+#* tranfer van kennis
+
+--
+count: false
+
+#* sterker teamverband
+
+--
+count: false
+
+#* vinden van alternatieve oplossingen
+
+---
+background-image: url(code_revies_looks_fine.png)
+---
+
+
+# Beste presentatie tot heden: "Protect your users with Circuit Breakers"
+
+
+---
+background-image: url(circuit_breaker_good.jpg)
+
+---
+background-image: url(circuit_breaker_bad.jpg)
+
+
+---
+background-image: url(cb_model.png)
+
+---
+# "Protect your users with Circuit Breakers"
+--
+count: false
+
+#* Hoe ga je om met "unhealthiness"?
+--
+
+count: false
+
+#* wie bepaald dat je systeem "unhealthy" is?
+--
+
+count: false
+
+#* Hoe kan je herstellen?
+
+---
+
+# Rasent populair "Service discovery".
+
+![Default-aligned image](service_discovery.png)
+---
+# Drie technologiën voorgesteld:
+
+--
+
+count: false
+
+#*zookeeper (apache)
+--
+
+count: false
+
+#* etct
+
+--
+
+count: false
+
+#* consul
+---
+
+
+#Dieptepunt tot heden: "Metaclasses for fun and profit..."
+
+![Default-aligned image](meta_hell.png)
+
+---
+# Na de lunch was't gelukkig weer raak...
+--
+![Default-aligned image](lunch.JPG)
+---
+# "System Testing with pytest and docker-py"
+
+![Default-aligned image](system_testing.png)
+---
+# "System Testing with pytest and docker-py"
+
+--
+count: false
+
+#* mooi: niet wat is testing, maar waarom doen we aan testing
+--
+count: false
+
+#* vertrouwen in het eigen product
+--
+count: false
+
+#* achteruitgang verkomen
+--
+count: false
+
+#* documentatie
+---
+--
+count: false
+
+#* mooi: niet de reden om te testen: vinden van alle bugs
+---
+# "Get in control of your workflows with Airflow"
+
+--
+count: false
+
+#* Airflow is een tool in puur python voor "workflow automation (and scheduling)"
+--
+count: false
+
+#* operators:``bash``, ``email``, ``http``, ``sql``
+
+--
+count: false
+
+#* sensors:  wacht op een bepaalde tijd, database entry, key oid...
+
+---
+
+#* GUI met overzicht van je runs, logging
+#* UI die de implementatie van een REST interface mogelijk maakt
+
+---
+# Last but no least: 3Di!
+
+![Default-aligned image](3Di_talk.JPG)
+
+---
+layout: false
+class: middle, center
+# Thank you!
+
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        highlightLanguage: 'sql',
+        highlightStyle: 'tomorrow-night-eighties'
+        });
+    </script>
+  </body>
+</html>
