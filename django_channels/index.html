@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>django channels - the new killer feature ;-)</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Permanent+Marker);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .header {
+        background: #dddddd;
+        font-family: 'Permanent Marker', cursive;
+        text-align: center;
+        border-top: solid #67b6f4 4px;
+        /*border-left: solid #67b6f4 6px;*/
+      }
+      .pro {border-top: solid 6px darkgreen}
+      .con {border-top: solid 6px darkred}
+      .bold {font-style: bold; font-size: 28px}
+
+      .rcorners {
+          border-radius: 25px;
+      }
+
+      .split-left { float: left; width: 48%; }
+      .split-right { float: right; width: 48%; }
+
+      .fat {font-size: 32px}
+
+
+      .detail {margin-left: 30px;
+        background: #dddddd;
+        border-left: solid #67b6f4 4px;
+        width: 70%;
+        padding-left: 5%;
+        padding-right: 10px;
+        font-style: italic;
+        font-size: 17px}
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+## Django channels...
+
+.bold[“...django's new killer feature.”]
+
+
+
+---
+layout: true
+
+.header[
+django channels - real time django]
+
+
+
+---
+
+# Agenda
+
+.fat[1. What's new or Why channels is a killer feature
+
+2. ASGI - a new emerging standard
+
+3. Protocols and routing
+
+4. async versus sync
+
+5. channels in 3Di]
+
+
+---
+
+# What's new or Why channels is a killer feature
+- Django as we know it: HTTP with WSGI (Web Server Gateway Interface) [PEP 333]
+
+- Django channels: HTTP + web sockets, chat protocols, IoT (Internet of Things), ...
+
+---
+
+# ASGI - a new emerging standard
+
+- ASGI stand for Asynchronous Server Gateway Interface (ASGI)
+
+- consists of two components: protocol server + application
+
+- from the docs
+
+```
+Like WSGI, the server hosts the application inside it,
+and dispatches incoming requests to it in a standardized
+format. Unlike WSGI, however, applications are instantiated
+objects that are fed events rather than simple callables,
+and must run as asyncio-compatible coroutines (on the main thread;
+they are free to use threading or other processes if they need
+synchronous code).
+
+```
+---
+# Protocols and routing
+
+
+---
+
+
+---
+
+
+---
+
+
+# headline
+
+
+---
+
+
+---
+
+---
+![Default-aligned image](on_channel.png)
+---
+![Default-aligned image](not_on_channel.png)
+---
+
+
+
+---
+# headline
+
+--
+
+count: false
+
+.split-left[
+.pro[pro]
+- less communication between app and database server
+- SQL statements are wrapped inside a function --> only one function
+  call instead of multiple SQL statements
+- performance
+]
+
+--
+
+count: false
+
+.split-right[
+.con[con]
+- version control is difficult
+- hard to debug
+- hard to implement unittests
+]
+
+---
+layout: false
+class: middle, center
+# Thank you!
+
+.fat[Questions?]
+
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        highlightLanguage: 'sql',
+        highlightStyle: 'tomorrow-night-eighties'
+        });
+    </script>
+  </body>
+</html>
