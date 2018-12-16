@@ -17,7 +17,7 @@
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       .header {
         background: #dddddd;
-        font-family: 'Permanent Marker', cursive;
+        font-family: 'Yanone Kaffeesatz', cursive;
         text-align: center;
         border-top: solid #67b6f4 4px;
         /*border-left: solid #67b6f4 6px;*/
@@ -84,9 +84,17 @@ django channels - real time django]
 ---
 
 # What's new or Why channels is a killer feature
+
 - Django as we know it: HTTP with WSGI (Web Server Gateway Interface) [PEP 333]
 
+- what is an WSGI app?
+
+   --> a single, synchronous callable
+
+   --> expects a request, returns a response
+
 - Django channels: HTTP + web sockets, chat protocols, IoT (Internet of Things), ...
+
 
 ---
 
@@ -94,74 +102,119 @@ django channels - real time django]
 
 - ASGI stand for Asynchronous Server Gateway Interface (ASGI)
 
-- consists of two components: protocol server + application
+- what is an ASGI app?
 
-- from the docs
+   --> a double, asynchronous callable (scope and coroutine)
+
+   --> callable has send and receive awaitables, thus the ability to wait for incoming events and send outgoing events
+
+   --> events are dicts with a predefined format -->  that is the basis of the standard
+
+
+
+---
+
+# Channels: consumers and routing
+
+- Consumer: equivalent of django view
+
+- each consumer a tiny ASGI app
+
+- use Routing to combine multiple apps into an bigger app
+
+
+
+
+---
+
+# Example
+
+
+```python
+from channels.auth import AuthMiddlewareStack
+# top level of ASGI app, main entry point
+from channels.routing import ProtocolTypeRouter
+# Routes http or websocket type connections via their HTTP path
+from channels.routing import URLRouter
+# Routes channel type scopes based on the value of the channel key
+from channels.routing import ChannelNameRouter
+
+import threedi_socket.routing
+from threedi_socket.workers.rain.rain_worker import RainGridCollector
+
+
+application = ProtocolTypeRouter(
+    {
+        # (http->django views is added by default)
+        "websocket": AuthMiddlewareStack(
+            URLRouter(threedi_socket.routing.websocket_urlpatterns)
+        ),
+        "channel": ChannelNameRouter(
+            {
+                "radar-worker": RainGridCollector,
+            }
+        ),
+    }
+)
+```
+
+---
+
+# channel layers
+
+- use channel layers for cross process communication (different protocol event == different server process)
+
+- standard is build on redis (channels_redis, official Django-maintained layer)
+
+- brings the ability of background workers to django
+
+---
+
+# Example cross process communication
+
+- remember: most predefined consumer functions are async (awaitables)
+
+```python
+from asgiref.sync import async_to_sync
+channels.layers.get_channel_layer()
+
+    ...
+
+    def loop(self):
+        self.connect()
+        while True:
+            try:
+                for item in self.pubsub.listen():
+                    if item["type"] == "message":
+                       msg_body = json.loads(item["data"].decode("utf-8"))
+                       self.broadcast_message(msg_body)
+            except ConnectionError:
+                logger.error("Lost connections to redis.")
+                self.connect()
+
+    def broadcast_message(self, msg_body):
+        event_name = msg_body["publish_type"]]
+        async_to_sync(channel_layer.group_send)(
+            "group_name", {"type": event_name, "kwargs": msg_body.get("kwargs")}
+        )
 
 ```
-Like WSGI, the server hosts the application inside it,
-and dispatches incoming requests to it in a standardized
-format. Unlike WSGI, however, applications are instantiated
-objects that are fed events rather than simple callables,
-and must run as asyncio-compatible coroutines (on the main thread;
-they are free to use threading or other processes if they need
-synchronous code).
-
-```
----
-# Protocols and routing
-
 
 ---
 
+# other ASGI frameworks
 
----
+- starlette
 
+- sanic
 
----
+# ASGI servers
 
+- daphne (twisted)
 
-# headline
+- uvicorn (uvloop/httptools)
 
-
----
-
-
----
-
----
-![Default-aligned image](on_channel.png)
----
-![Default-aligned image](not_on_channel.png)
----
-
-
-
----
-# headline
-
---
-
-count: false
-
-.split-left[
-.pro[pro]
-- less communication between app and database server
-- SQL statements are wrapped inside a function --> only one function
-  call instead of multiple SQL statements
-- performance
-]
-
---
-
-count: false
-
-.split-right[
-.con[con]
-- version control is difficult
-- hard to debug
-- hard to implement unittests
-]
+- hypercorn (sans-io hyper, wsproto)
 
 ---
 layout: false
